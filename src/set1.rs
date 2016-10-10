@@ -1,3 +1,26 @@
+fn hex_chars_to_hex_number(input: Vec<u8>) -> Vec<u8> {
+  // ranges for characters
+  const NUMERIC_BEGIN: u8 = '0' as u8;
+  const NUMERIC_END: u8 = '9' as u8;
+  const LOWER_LETTER_BEGIN: u8 = 'a' as u8;
+  const LOWER_LETTER_END: u8 = 'f' as u8;
+  const UPPER_LETTER_BEGIN: u8 = 'A' as u8;
+  const UPPER_LETTER_END: u8 = 'F' as u8;
+
+  let mut output = Vec::new();
+  for byte in input {
+    // convert the character data to the numeric representation
+    let true_number = match byte {
+      NUMERIC_BEGIN ... NUMERIC_END => byte - NUMERIC_BEGIN,
+      LOWER_LETTER_BEGIN ... LOWER_LETTER_END => byte - LOWER_LETTER_BEGIN + 10,
+      UPPER_LETTER_BEGIN ... UPPER_LETTER_END => byte - UPPER_LETTER_BEGIN + 10,
+      _ => 0
+    };
+    output.push(true_number);
+  }
+  output
+}
+
 fn bit_value_to_base64(bit: u8) -> u8 {
   match bit {
     0 ... 25 => ('A' as u8) + bit,
@@ -64,33 +87,23 @@ fn hex_to_base64(input: Vec<u8>) -> Vec<u8> {
   result
 }
 
-fn hex_chars_to_hex_number(input: Vec<u8>) -> Vec<u8> {
-  // ranges for characters
-  const NUMERIC_BEGIN: u8 = '0' as u8;
-  const NUMERIC_END: u8 = '9' as u8;
-  const LOWER_LETTER_BEGIN: u8 = 'a' as u8;
-  const LOWER_LETTER_END: u8 = 'f' as u8;
-  const UPPER_LETTER_BEGIN: u8 = 'A' as u8;
-  const UPPER_LETTER_END: u8 = 'F' as u8;
-
-  let mut output = Vec::new();
-  for byte in input {
-    // convert the character data to the numeric representation
-    let true_number = match byte {
-      NUMERIC_BEGIN ... NUMERIC_END => byte - NUMERIC_BEGIN,
-      LOWER_LETTER_BEGIN ... LOWER_LETTER_END => byte - LOWER_LETTER_BEGIN + 10,
-      UPPER_LETTER_BEGIN ... UPPER_LETTER_END => byte - UPPER_LETTER_BEGIN + 10,
-      _ => 0
-    };
-    output.push(true_number);
-  }
-  output
-}
-
 #[test]
 fn test_challenge_1() {
   let input = hex_chars_to_hex_number(b"49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".to_vec());
   let output = b"SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
 
   assert!(hex_to_base64(input.to_vec()) == output.to_vec());
+}
+
+fn fixed_xor(a: Vec<u8>, b: Vec<u8>) -> Vec<u8> {
+  a.iter().zip(b.iter()).map(|(aa,bb)| aa ^ bb).collect()
+}
+
+#[test]
+fn test_challenge_2() {
+  let a = hex_chars_to_hex_number(b"1c0111001f010100061a024b53535009181c".to_vec());
+  let b = hex_chars_to_hex_number(b"686974207468652062756c6c277320657965".to_vec());
+
+  let result = hex_chars_to_hex_number(b"746865206b696420646f6e277420706c6179".to_vec());
+  assert!(fixed_xor(a,b) == result);
 }

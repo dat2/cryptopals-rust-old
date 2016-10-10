@@ -1,3 +1,4 @@
 [root]
 name = "cryptopals"
 version = "0.1.0"
+
